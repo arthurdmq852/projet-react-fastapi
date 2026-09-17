@@ -1,7 +1,9 @@
-export function HomePage() {
+import Layout from '../components/layout/Layout.tsx'
+
+export default function HomePage() {
   return(
-    <div>
+    <Layout>
       <h1>Chouffin's Paradise</h1>
-    </div>
+    </Layout>
   );
 }

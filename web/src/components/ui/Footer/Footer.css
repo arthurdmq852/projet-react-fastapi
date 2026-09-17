@@ -1,0 +1,6 @@
+import "@fontsource/jetbrains-mono"
+
+.footer {
+  font-family: "JetBrains Mono"
+  color: #000;
+}

@@ -1,11 +1,12 @@
-import Button from '../components/layout/Button'
+import Button from '../components/ui/Button'
+import Layout from '../components/layout/Layout.tsx'
 
 export default function LoginPage() {
   return(
-    <>
-      <h1>Connexion</h1>
+    <Layout>
+      <h2>Connexion</h2>
       <Button>Se Connecter</Button>
       <a href="/register">S'inscrire ?</a>
-    </>
+    </Layout>
   )
 }
