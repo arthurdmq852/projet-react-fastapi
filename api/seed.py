@@ -4,7 +4,6 @@ from db.database import async_session_maker, init_db
 from models.item import Item
 
 GAMES_DATA = [
-    # --- Catégorie 1 : Action / Aventure (10 jeux) ---
     {"titre": "The Legend of Zelda: Breath of the Wild", "categorie": "Action / Aventure", "description": "Aventure en monde ouvert dans le royaume d'Hyrule.", "image_url": "https://images.unsplash.com/photo-1550745165-9bc0b252726f", "annee": 2017, "studio": "Nintendo", "plateforme": "Nintendo Switch"},
     {"titre": "God of War", "categorie": "Action / Aventure", "description": "Kratos et son fils Atreus parcourent les terres des dieux nordiques.", "image_url": "https://images.unsplash.com/photo-1542751371-adc38448a05e", "annee": 2018, "studio": "Santa Monica Studio", "plateforme": "PlayStation 4 / PC"},
     {"titre": "Red Dead Redemption 2", "categorie": "Action / Aventure", "description": "L'épopée sauvage d'Arthur Morgan au crépuscule de l'ère des hors-la-loi.", "image_url": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23", "annee": 2018, "studio": "Rockstar Games", "plateforme": "Multiplateforme"},
@@ -28,7 +27,6 @@ GAMES_DATA = [
     {"titre": "Mass Effect Legendary Edition", "categorie": "RPG", "description": "Le Commandant Shepard rassemble un équipage pour sauver la galaxie.", "image_url": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23", "annee": 2021, "studio": "BioWare", "plateforme": "Multiplateforme"},
     {"titre": "Fallout: New Vegas", "categorie": "RPG", "description": "Un coursier cherche vengeance dans le désert post-nucléaire du Mojave.", "image_url": "https://images.unsplash.com/photo-1542751371-adc38448a05e", "annee": 2010, "studio": "Obsidian", "plateforme": "PC / Xbox / PlayStation"},
 
-    # --- Catégorie 3 : FPS / Tir (10 jeux) ---
     {"titre": "DOOM Eternal", "categorie": "FPS / Tir", "description": "Le Slayer anéantit les hordes démoniaques à un rythme effréné.", "image_url": "https://images.unsplash.com/photo-1550745165-9bc0b252726f", "annee": 2020, "studio": "id Software", "plateforme": "Multiplateforme"},
     {"titre": "Half-Life 2", "categorie": "FPS / Tir", "description": "Gordon Freeman mène la rébellion contre l'oppression extraterrestre du Cartel.", "image_url": "https://images.unsplash.com/photo-1511512578047-dfb367046420", "annee": 2004, "studio": "Valve", "plateforme": "PC"},
     {"titre": "BioShock Infinite", "categorie": "FPS / Tir", "description": "Booker DeWitt explore la cité flottante de Columbia pour libérer Elizabeth.", "image_url": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5", "annee": 2013, "studio": "Irrational Games", "plateforme": "Multiplateforme"},
@@ -40,7 +38,6 @@ GAMES_DATA = [
     {"titre": "Far Cry 3", "categorie": "FPS / Tir", "description": "Jason Brody affronte la folie de Vaas Montenegro sur une île tropicale.", "image_url": "https://images.unsplash.com/photo-1542751371-adc38448a05e", "annee": 2012, "studio": "Ubisoft", "plateforme": "Multiplateforme"},
     {"titre": "Borderlands 2", "categorie": "FPS / Tir", "description": "Chasseurs de l'Arche déjantés et déluge d'armes contre le Beau Jack.", "image_url": "https://images.unsplash.com/photo-1550745165-9bc0b252726f", "annee": 2012, "studio": "Gearbox", "plateforme": "Multiplateforme"},
 
-    # --- Catégorie 4 : Course / Sport (10 jeux) ---
     {"titre": "Forza Horizon 5", "categorie": "Course / Sport", "description": "Festival de courses sur les routes splendides et variées du Mexique.", "image_url": "https://images.unsplash.com/photo-1511512578047-dfb367046420", "annee": 2021, "studio": "Playground Games", "plateforme": "Xbox / PC"},
     {"titre": "Gran Turismo 7", "categorie": "Course / Sport", "description": "Simulation automobile réaliste célébrant l'histoire et la culture de l'auto.", "image_url": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5", "annee": 2022, "studio": "Polyphony Digital", "plateforme": "PlayStation"},
     {"titre": "Mario Kart 8 Deluxe", "categorie": "Course / Sport", "description": "Courses d'arcade endiablées en karting avec des objets funs entre amis.", "image_url": "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f", "annee": 2017, "studio": "Nintendo", "plateforme": "Nintendo Switch"},
