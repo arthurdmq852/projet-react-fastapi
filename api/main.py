@@ -3,15 +3,15 @@ from collections.abc import AsyncGenerator
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from routers.items import router as items_router
 
 from core.config import settings
 from db.database import init_db
-import models  # Important : force l'enregistrement des modèles SQLModel avant la création des tables
+import models 
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    # Au démarrage : crée le fichier SQLite et les 3 tables s'ils n'existent pas
     await init_db()
     yield
 
@@ -38,3 +38,4 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException) ->
         status_code=exc.status_code,
         content={"erreur": {"code": exc.status_code, "message": exc.detail}},
     )
+app.include_router(items_router)
