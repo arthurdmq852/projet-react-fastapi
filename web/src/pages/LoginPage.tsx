@@ -1,12 +1,13 @@
-import Button from '../components/ui/Button'
-import Layout from '../components/layout/Layout.tsx'
+import Navbar from '../components/ui/Navbar/Navbar.tsx'
+import Footer from '../components/ui/Footer/Footer.tsx'
+import LoginComponent from '../components/ui/LoginComponent.tsx'
 
-export default function LoginPage() {
+export default function HomePage() {
   return(
-    <Layout>
-      <h2>Connexion</h2>
-      <Button>Se Connecter</Button>
-      <a href="/register">S'inscrire ?</a>
-    </Layout>
-  )
+  <div>
+    <Navbar/>
+      <LoginComponent/>
+    <Footer/>
+  </div>
+  );
 }

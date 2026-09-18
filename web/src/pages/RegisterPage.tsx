@@ -1,12 +1,11 @@
-import Button from '../components/ui/Button'
-import Layout from '../components/layout/Layout.tsx'
+import Navbar from '../components/ui/Navbar/Navbar.tsx'
+import Footer from '../components/ui/Footer/Footer.tsx'
 
-export default function RegisterPage() {
+export default function HomePage() {
   return(
-    <Layout>
-      <h1>Inscription</h1>
-      <Button>S'inscrire</Button>
-      <a href="/login">Déjà un compte ? Se connecter</a>
-    </Layout>
-  )
+  <div>
+    <Navbar/>
+    <Footer/>
+  </div>
+  );
 }

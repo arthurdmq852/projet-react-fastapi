@@ -1,9 +1,11 @@
-import Layout from '../components/layout/Layout.tsx'
+import Navbar from '../components/ui/Navbar/Navbar.tsx'
+import Footer from '../components/ui/Footer/Footer.tsx'
 
 export default function HomePage() {
   return(
-    <Layout>
-      <h1>Chouffin's Paradise</h1>
-    </Layout>
+  <div>
+    <Navbar/>
+    <Footer/>
+  </div>
   );
 }
