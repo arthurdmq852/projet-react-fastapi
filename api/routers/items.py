@@ -19,24 +19,44 @@ router = APIRouter(
     response_model=PaginatedItems,
 )
 async def get_items(
-    q: str | None = Query(default=None, min_length=2),
-    categorie: str | None = Query(default=None),
-    page: int = Query(default=1, ge=1),
-    limit: int = Query(default=12, ge=1, le=50),
+    q: str | None = Query(
+        default=None,
+        min_length=2,
+        description="Recherche par mot-clé dans le titre",
+    ),
+    categorie: str | None = Query(
+        default=None,
+        description="Filtrer par nom de catégorie",
+    ),
+    page: int = Query(
+        default=1,
+        ge=1,
+        description="Numéro de la page (>= 1)",
+    ),
+    limit: int = Query(
+        default=12,
+        ge=1,
+        le=50,
+        description="Nombre d'éléments par page (1 à 50)",
+    ),
     session: AsyncSession = Depends(get_session),
 ) -> PaginatedItems:
     statement = select(Item)
 
+    # 1. Filtre par mot-clé sur le titre (insensible à la casse)
     if q:
         statement = statement.where(Item.titre.ilike(f"%{q}%"))
 
+    # 2. Filtre par catégorie exacte
     if categorie:
         statement = statement.where(Item.categorie == categorie)
 
-    total_statement = select(func.count()).select_from(statement.subquery())
-    total_result = await session.exec(total_statement)
+    # 3. Calcul du nombre total d'éléments correspondant aux filtres
+    count_statement = select(func.count()).select_from(statement.subquery())
+    total_result = await session.exec(count_statement)
     total = total_result.one()
 
+    # 4. Pagination (offset et limit)
     offset = (page - 1) * limit
     statement = statement.offset(offset).limit(limit)
 
@@ -63,10 +83,11 @@ async def get_item(
 ) -> ItemRead:
     item = await session.get(Item, item_id)
 
+    # Renvoie une erreur 404 si l'identifiant n'existe pas en base
     if not item:
         raise HTTPException(
             status_code=404,
-            detail="Jeu introuvable",
+            detail="Item introuvable",
         )
 
     return item
