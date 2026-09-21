@@ -1,5 +1,3 @@
-//import { ButtonHTMLAttributes } from "react";
-
 type ButtonVariant = "blue" | "white" | "transparent" | "blueInverted"
 
 interface ButtonProps {

@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import Button from './Button.tsx';
+import Button from '../ui/Button/Button.tsx';
+import { useNavigate } from 'react-router';
 
 export default function LoginComponent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  let navigate = useNavigate();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -53,7 +55,7 @@ export default function LoginComponent() {
         Mot de passe oublié ?
       </Button>
           
-      <Button variant="blueInverted">
+      <Button variant="blueInverted" onClick={() => navigate("/register")}>
         Créer un nouveau compte
       </Button>
     </form>

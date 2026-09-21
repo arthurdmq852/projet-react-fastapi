@@ -5,6 +5,11 @@ export default function HomePage() {
   return(
   <div>
     <Navbar/>
+      <div className="items-center w-1/2 self-center">
+        <h1 className="text-white items-left text-left" >Selon votre collection</h1>
+        <p className="text-white items-left text-left">Votre collection</p>
+        <a href="/catalog" className="text-left">Découvrir de nouveaux jeux</a>
+      </div>
     <Footer/>
   </div>
   );

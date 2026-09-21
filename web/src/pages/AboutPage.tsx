@@ -5,24 +5,16 @@ export default function AboutPage() {
   return(
   <div>
     <Navbar/>
-      <div>
-        <form className="bg-white rounded-sm p-8 w-full max-w-sm flex flex-col gap-4">
-          <h1 className="!text-red">
+      <div className="flex justify-center items-center">
+        <form className="bg-white rounded-xl p-8 w-full max-w-xl flex flex-col">
+          <h1 className="text-4xl font-bold !text-gray-400">
             C'est quoi un Chouffin
           </h1>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipiscing elit. 
-              Placerat in id cursus mi pretium tellus duis. 
-              Urna tempor pulvinar vivamus fringilla lacus nec metus. 
-              Integer nunc posuere ut hendrerit semper vel class. 
-              Conubia nostra inceptos himenaeos orci varius natoque penatibus. 
-              Mus donec rhoncus eros lobortis nulla molestie mattis. 
-              Purus est efficitur laoreet mauris pharetra vestibulum fusce. 
-              Sodales consequat magna ante condimentum neque at luctus.
-              Ligula congue sollicitudin erat viverra ac tincidunt nam.
-              Lectus commodo augue arcu dignissim velit aliquam imperdiet. 
-              Cras eleifend turpis fames primis vulputate ornare sagittis. 
-              Libero feugiat tristique accumsan maecenas potenti ultricies habitant. 
+            Chouffin est un terme inventé sur le forum 18-25 désignant un stéréotype de geek ayant un physique ingrat, barbu, 
+            en surpoids et malpropre, beauf sur les bords, et fan d'une culture populaire mainstream comme Le Seigneur des Anneaux, 
+            World of Warcraft, et surtout la série Kaamelott. <br /> <br/>
+            En tant qu'amateur d'alcool, le chouffin consomme à profusion des bières, telles que la chouffe, d'où provient son sobriquet. 
             </p>
         </form>
       </div>
