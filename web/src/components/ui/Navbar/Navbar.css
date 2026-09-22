@@ -1,9 +1,15 @@
 .navbar {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: #121214;
   padding: 0.5rem 1rem;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
 }
 
 .navbar-left a, .navbar-center {
@@ -19,9 +25,16 @@
   font-size: 0.95rem;
 }
 
+.navbar-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .navbar-right {
   display: flex;
-  gap: 5px;
+  gap: 12px;
   align-items: center;
 }
 
@@ -36,4 +49,8 @@
 
 .navbar-center .nav-links li {
   margin-right: 1rem;
+}
+
+.navbar-center .nav-links li:last-child {
+  margin-right: 0;
 }

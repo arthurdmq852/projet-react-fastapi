@@ -44,7 +44,7 @@ export default function RegisterComponent() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900">
+    <div className="flex items-center justify-center h-full bg-gray-900">
       <form
         onSubmit={handleSubmit}
         className="bg-white rounded-2xl p-8 w-full max-w-sm flex flex-col gap-4"

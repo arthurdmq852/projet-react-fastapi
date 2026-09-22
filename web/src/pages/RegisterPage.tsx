@@ -3,11 +3,13 @@ import Footer from '../components/ui/Footer/Footer.tsx'
 import RegisterComponent from '../components/auth/RegisterComponent.tsx'
 
 export default function RegisterPage() {
-  return(
-  <div>
-    <Navbar/>
-    <RegisterComponent/>
-    <Footer/>
-  </div>
+  return (
+    <div className="flex flex-col flex-1 min-h-0 overflow-hidden h-full">
+      <Navbar/>
+      <div className="flex-1 min-h-0">
+        <RegisterComponent/>
+      </div>
+      <Footer/>
+    </div>
   );
 }
