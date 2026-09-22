@@ -4,8 +4,10 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from routers.items import router as items_router
-
+from routers.auth import router as auth_router
+from models.favorite import Favorite
 from core.config import settings
+from routers.favorite import router as favorites_router
 from db.database import init_db
 import models 
 
@@ -39,3 +41,5 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException) ->
         content={"erreur": {"code": exc.status_code, "message": exc.detail}},
     )
 app.include_router(items_router)
+app.include_router(auth_router)
+app.include_router(favorites_router)
