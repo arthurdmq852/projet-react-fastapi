@@ -66,4 +66,5 @@ web/
 
 ## Auteurs
 
-- *(à compléter)*
+- Zyad Laouani
+- Arthur Demarcq
