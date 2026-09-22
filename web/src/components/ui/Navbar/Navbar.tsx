@@ -1,39 +1,61 @@
 import './Navbar.css'
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from '../Button/Button.tsx';
 import SearchBar from '../SearchBar/SearchBar.tsx';
+import { useAuth } from '../../../context/AuthContext';
 
 export default function Navbar() {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
 
-  return(
-    <nav className="navbar" >
+  function handleSearch(terme: string) {
+    navigate(`/catalogue${terme ? `?q=${encodeURIComponent(terme)}` : ''}`);
+  }
+
+  function handleLogout() {
+    logout();
+    navigate('/');
+  }
+
+  return (
+    <nav className="navbar">
       <div className="navbar-left">
-        <a href="/"><img src="/chouffin_chapeau.jpg" width={70} height={70}/>Chouffins Marketplace</a>
+        <Link to="/"><img src="/chouffin_chapeau.jpg" width={70} height={70} alt="" />Chouffins Marketplace</Link>
       </div>
 
       <div className="navbar-center">
         <ul className="nav-links">
           <li>
-            <a href="/catalogue">Catalogue</a>
+            <Link to="/catalogue">Catalogue</Link>
           </li>
-          <li>
-            <a href="/"></a>
-          </li>
-          <li>
-            <a href="/contact">Contact</a>
-          </li>
+          {isAuthenticated && (
+            <>
+              <li>
+                <Link to="/collection">Ma collection</Link>
+              </li>
+              <li>
+                <Link to="/stats">Statistiques</Link>
+              </li>
+            </>
+          )}
         </ul>
       </div>
 
-     <div className="navbar-right">
-      <Button 
-        variant="blue"
-        onClick={() => navigate("/login")}>
-          Connexion
-      </Button>
-      <SearchBar />
-    </div>
-  </nav>
+      <div className="navbar-right">
+        {isAuthenticated ? (
+          <>
+            {user && <span className="text-white text-sm">{user.email}</span>}
+            <Button variant="blue" onClick={handleLogout}>
+              Déconnexion
+            </Button>
+          </>
+        ) : (
+          <Button variant="blue" onClick={() => navigate("/login")}>
+            Connexion
+          </Button>
+        )}
+        <SearchBar onSubmit={handleSearch} />
+      </div>
+    </nav>
   );
 }

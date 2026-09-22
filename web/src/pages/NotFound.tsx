@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import chouffinChapeau from '/chouffin_chapeau.avif'
 
 export default function NotFound() {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   return(
     <div>
       <Navbar/>

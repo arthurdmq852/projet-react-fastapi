@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button/Button.tsx';
-import { useAuth } from '../../context/AuthContext'; // adapte le chemin si besoin
+import { useAuth } from '../../context/AuthContext';
 
 export default function LoginComponent() {
   const [email, setEmail] = useState("");
@@ -39,8 +39,9 @@ export default function LoginComponent() {
         className="bg-white rounded-2xl p-8 w-full max-w-sm flex flex-col gap-4"
       >
         <a className="!text-black font-semibold text-center mb-2">
-          Se connecter à Chouffins Marketplace
+          Se connecter
         </a>
+        <p>Chouffins Marketplace</p>
 
         <input
           type="email"
