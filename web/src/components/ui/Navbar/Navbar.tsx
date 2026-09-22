@@ -15,10 +15,10 @@ export default function Navbar() {
       <div className="navbar-center">
         <ul className="nav-links">
           <li>
-            <a href="/catalog">Catalogue</a>
+            <a href="/catalogue">Catalogue</a>
           </li>
           <li>
-            <a href="/about">A Propos</a>
+            <a href="/"></a>
           </li>
           <li>
             <a href="/contact">Contact</a>
