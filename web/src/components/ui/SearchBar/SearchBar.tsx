@@ -2,10 +2,8 @@ import { useState } from 'react';
 import type { KeyboardEvent } from 'react';
 
 interface SearchBarProps {
-  // Contrôlé : le parent gère l'état (ex. CataloguePage + debounce).
   valeur?: string;
   onChange?: (valeur: string) => void;
-  // Non-contrôlé : garde son propre état et prévient au Entrée (ex. barre de la Navbar).
   onSubmit?: (valeur: string) => void;
   placeholder?: string;
 }
