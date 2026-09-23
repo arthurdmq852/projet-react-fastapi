@@ -58,11 +58,9 @@ async def seed() -> None:
     async with async_session_maker() as session:
         ajoutes = 0
         for game in GAMES_DATA:
-            # Vérification anti-doublon par titre (idempotence)
             statement = select(Item).where(Item.titre == game["titre"])
-            result = await session.execute(statement)
-            existing = result.scalar_one_or_none()
-
+            result = await session.exec(statement)
+            existing = result.first()
             if not existing:
                 item = Item(**game)
                 session.add(item)
