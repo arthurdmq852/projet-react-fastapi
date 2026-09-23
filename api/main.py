@@ -5,9 +5,9 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from routers.items import router as items_router
 from routers.auth import router as auth_router
-from models.favorite import Favorite
+from models.collection_entry import CollectionEntry
 from core.config import settings
-from routers.favorite import router as favorites_router
+from routers.collection import router as collection_router
 from db.database import init_db
 import models 
 
@@ -42,4 +42,4 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException) ->
     )
 app.include_router(items_router)
 app.include_router(auth_router)
-app.include_router(favorites_router)
+app.include_router(collection_router)
