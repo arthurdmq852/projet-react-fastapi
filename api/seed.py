@@ -1,7 +1,7 @@
 import asyncio
-from sqlmodel import select
-from db.database import async_session_maker, init_db
-from models.item import Item
+
+from db.database import close_db, get_pool, init_db
+
 
 GAMES_DATA = [
     {"titre": "The Legend of Zelda: Breath of the Wild", "categorie": "Action / Aventure", "description": "Aventure en monde ouvert dans le royaume d'Hyrule.", "image_url": "https://images.unsplash.com/photo-1550745165-9bc0b252726f", "annee": 2017, "studio": "Nintendo", "plateforme": "Nintendo Switch"},
@@ -15,7 +15,6 @@ GAMES_DATA = [
     {"titre": "Assassin's Creed Valhalla", "categorie": "Action / Aventure", "description": "Eivor mène son clan viking à la conquête de l'Angleterre médiévale.", "image_url": "https://images.unsplash.com/photo-1563089145-599997674d42", "annee": 2020, "studio": "Ubisoft", "plateforme": "Multiplateforme"},
     {"titre": "Death Stranding", "categorie": "Action / Aventure", "description": "Sam Porter Bridges reconnecte les villes isolées d'une Amérique brisée.", "image_url": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23", "annee": 2019, "studio": "Kojima Productions", "plateforme": "PlayStation / PC"},
 
-    # --- Catégorie 2 : RPG (10 jeux) ---
     {"titre": "The Witcher 3: Wild Hunt", "categorie": "RPG", "description": "Geralt de Riv traque la prophétie de l'Enfant du Sang Ancien.", "image_url": "https://images.unsplash.com/photo-1542751371-adc38448a05e", "annee": 2015, "studio": "CD Projekt Red", "plateforme": "Multiplateforme"},
     {"titre": "Elden Ring", "categorie": "RPG", "description": "Un Sans-Éclat cherche à restaurer le Cercle d'Elden dans l'Entre-Terre.", "image_url": "https://images.unsplash.com/photo-1550745165-9bc0b252726f", "annee": 2022, "studio": "FromSoftware", "plateforme": "Multiplateforme"},
     {"titre": "Cyberpunk 2077", "categorie": "RPG", "description": "V tente de survivre dans la mégalopole futuriste et impitoyable de Night City.", "image_url": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5", "annee": 2020, "studio": "CD Projekt Red", "plateforme": "Multiplateforme"},
@@ -52,22 +51,31 @@ GAMES_DATA = [
 
 
 async def seed() -> None:
-    print("Initialisation de la base de données...")
     await init_db()
-
-    async with async_session_maker() as session:
+    try:
+        pool = get_pool()
         ajoutes = 0
-        for game in GAMES_DATA:
-            statement = select(Item).where(Item.titre == game["titre"])
-            result = await session.exec(statement)
-            existing = result.first()
-            if not existing:
-                item = Item(**game)
-                session.add(item)
-                ajoutes += 1
 
-        await session.commit()
-        print(f"Peuplement terminé : {ajoutes} nouveaux jeux insérés sur {len(GAMES_DATA)} au catalogue.")
+        async with pool.acquire() as conn:
+            for game in GAMES_DATA:
+                row = await conn.fetchrow(
+                    "INSERT INTO items (titre, categorie, description, image_url, annee, studio, plateforme) "
+                    "VALUES ($1, $2, $3, $4, $5, $6, $7) "
+                    "ON CONFLICT (titre) DO NOTHING RETURNING id",
+                    game["titre"],
+                    game["categorie"],
+                    game["description"],
+                    game["image_url"],
+                    game["annee"],
+                    game["studio"],
+                    game["plateforme"],
+                )
+                if row is not None:
+                    ajoutes += 1
+
+        print(f"Peuplement terminé : {ajoutes} nouveaux jeux sur {len(GAMES_DATA)}.")
+    finally:
+        await close_db()
 
 
 if __name__ == "__main__":

@@ -1,9 +1,6 @@
+import asyncpg
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlmodel import func, select
-from sqlmodel.ext.asyncio.session import AsyncSession
-
 from db.database import get_session
-from models.item import Item
 from schemas.item import ItemRead, PaginatedItems
 
 
@@ -23,31 +20,34 @@ async def get_items(
     categorie: str | None = Query(default=None),
     page: int = Query(default=1, ge=1),
     limit: int = Query(default=12, ge=1, le=50),
-    session: AsyncSession = Depends(get_session),
+    session: asyncpg.Connection = Depends(get_session),
 ) -> PaginatedItems:
-    statement = select(Item)
+    filtre = (
+        "WHERE ($1::text IS NULL OR titre ILIKE '%' || $1 || '%') "
+        "AND ($2::text IS NULL OR categorie = $2)"
+    )
 
-    if q:
-        statement = statement.where(Item.titre.ilike(f"%{q}%"))
+    total = await session.fetchval(
+        f"SELECT COUNT(*) FROM items {filtre}",
+        q,
+        categorie,
+    )
 
-    if categorie:
-        statement = statement.where(Item.categorie == categorie)
-
-    count_statement = select(func.count()).select_from(statement.subquery())
-    total_result = await session.exec(count_statement)
-    total = total_result.one()
-
-    offset = (page - 1) * limit
-    statement = statement.offset(offset).limit(limit)
-
-    result = await session.exec(statement)
-    items = result.all()
+    rows = await session.fetch(
+        f"SELECT id, titre, categorie, description, image_url, "
+        f"annee, studio, plateforme FROM items {filtre} "
+        "ORDER BY id LIMIT $3 OFFSET $4",
+        q,
+        categorie,
+        limit,
+        (page - 1) * limit,
+    )
 
     return PaginatedItems(
         total=total,
         page=page,
         limit=limit,
-        results=items,
+        results=[ItemRead.model_validate(dict(row)) for row in rows],
     )
 
 
@@ -59,14 +59,18 @@ async def get_items(
 )
 async def get_item(
     item_id: int,
-    session: AsyncSession = Depends(get_session),
+    session: asyncpg.Connection = Depends(get_session),
 ) -> ItemRead:
-    item = await session.get(Item, item_id)
+    row = await session.fetchrow(
+        "SELECT id, titre, categorie, description, image_url, "
+        "annee, studio, plateforme FROM items WHERE id = $1",
+        item_id,
+    )
 
-    if not item:
+    if row is None:
         raise HTTPException(
             status_code=404,
             detail="Item introuvable",
         )
 
-    return item
+    return ItemRead.model_validate(dict(row))

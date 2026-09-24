@@ -1,17 +1,14 @@
+import asyncpg
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.dependencies import get_current_user
 from db.database import get_session
-from models.collection_entry import CollectionEntry, StatutEnum
-from models.item import Item
-from models.user import User
 from schemas.collection import (
     CollectionEntryCreate,
     CollectionEntryRead,
     CollectionEntryUpdate,
     StatsResponse,
+    StatutEnum,
 )
 from schemas.item import ItemRead
 
@@ -21,46 +18,56 @@ router = APIRouter(
     tags=["Collection"],
 )
 
+ITEM_FIELDS = (
+    "i.id, i.titre, i.categorie, i.description, "
+    "i.image_url, i.annee, i.studio, i.plateforme"
+)
+
+
+def lire_entree(row: asyncpg.Record | dict) -> CollectionEntryRead:
+    item = {key: row[key] for key in ItemRead.model_fields}
+
+    return CollectionEntryRead(
+        id=row["entry_id"],
+        statut=row["statut"],
+        note=row["note"],
+        commentaire=row["commentaire"],
+        date_ajout=row["date_ajout"],
+        item=ItemRead.model_validate(item),
+    )
+
 
 @router.get(
     "/collection",
     summary="Lister ma collection",
     response_model=list[CollectionEntryRead],
+    responses={401: {"description": "Token invalide ou expiré"}},
 )
 async def list_collection(
     statut: StatutEnum | None = Query(default=None),
-    tri: str | None = Query(default=None, regex="^(date|note)$"),
-    current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
+    tri: str | None = Query(default=None, pattern="^(date|note)$"),
+    current_user: dict = Depends(get_current_user),
+    session: asyncpg.Connection = Depends(get_session),
 ) -> list[CollectionEntryRead]:
-    statement = (
-        select(CollectionEntry, Item)
-        .join(Item, CollectionEntry.item_id == Item.id)
-        .where(CollectionEntry.user_id == current_user.id)
+    ordre = (
+        "e.note DESC NULLS LAST, e.id DESC"
+        if tri == "note"
+        else "e.date_ajout DESC, e.id DESC"
     )
 
-    if statut:
-        statement = statement.where(CollectionEntry.statut == statut)
+    rows = await session.fetch(
+        f"SELECT e.id AS entry_id, e.statut, e.note, "
+        f"e.commentaire, e.date_ajout, {ITEM_FIELDS} "
+        "FROM collection_entries e "
+        "JOIN items i ON i.id = e.item_id "
+        f"WHERE e.user_id = $1 "
+        f"AND ($2::text IS NULL OR e.statut = $2) "
+        f"ORDER BY {ordre}",
+        current_user["id"],
+        statut.value if statut else None,
+    )
 
-    if tri == "note":
-        statement = statement.order_by(CollectionEntry.note.desc().nulls_last())
-    else:
-        statement = statement.order_by(CollectionEntry.date_ajout.desc())
-
-    result = await session.exec(statement)
-    rows = result.all()
-
-    return [
-        CollectionEntryRead(
-            id=entry.id,
-            statut=entry.statut,
-            note=entry.note,
-            commentaire=entry.commentaire,
-            date_ajout=entry.date_ajout,
-            item=ItemRead.model_validate(item),
-        )
-        for entry, item in rows
-    ]
+    return [lire_entree(row) for row in rows]
 
 
 @router.post(
@@ -75,46 +82,40 @@ async def list_collection(
 )
 async def add_to_collection(
     data: CollectionEntryCreate,
-    current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
+    current_user: dict = Depends(get_current_user),
+    session: asyncpg.Connection = Depends(get_session),
 ) -> CollectionEntryRead:
-    item = await session.get(Item, data.item_id)
-    if not item:
+    item = await session.fetchrow(
+        f"SELECT {ITEM_FIELDS} FROM items i WHERE i.id = $1",
+        data.item_id,
+    )
+
+    if item is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=404,
             detail="Item introuvable",
         )
 
-    statement = select(CollectionEntry).where(
-        CollectionEntry.user_id == current_user.id,
-        CollectionEntry.item_id == data.item_id,
+    entry = await session.fetchrow(
+        "INSERT INTO collection_entries "
+        "(user_id, item_id, statut, note, commentaire) "
+        "VALUES ($1, $2, $3, $4, $5) "
+        "ON CONFLICT (user_id, item_id) DO NOTHING "
+        "RETURNING id AS entry_id, statut, note, commentaire, date_ajout",
+        current_user["id"],
+        data.item_id,
+        data.statut.value,
+        data.note,
+        data.commentaire,
     )
-    res = await session.exec(statement)
-    if res.first() is not None:
+
+    if entry is None:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
+            status_code=409,
             detail="Élément déjà présent dans votre collection",
         )
 
-    entry = CollectionEntry(
-        user_id=current_user.id,
-        item_id=data.item_id,
-        statut=data.statut,
-        note=data.note,
-        commentaire=data.commentaire,
-    )
-    session.add(entry)
-    await session.commit()
-    await session.refresh(entry)
-
-    return CollectionEntryRead(
-        id=entry.id,
-        statut=entry.statut,
-        note=entry.note,
-        commentaire=entry.commentaire,
-        date_ajout=entry.date_ajout,
-        item=ItemRead.model_validate(item),
-    )
+    return lire_entree({**dict(entry), **dict(item)})
 
 
 @router.patch(
@@ -126,43 +127,41 @@ async def add_to_collection(
 async def update_entry(
     entry_id: int,
     data: CollectionEntryUpdate,
-    current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
+    current_user: dict = Depends(get_current_user),
+    session: asyncpg.Connection = Depends(get_session),
 ) -> CollectionEntryRead:
-    statement = select(CollectionEntry).where(
-        CollectionEntry.id == entry_id,
-        CollectionEntry.user_id == current_user.id,
-    )
-    res = await session.exec(statement)
-    entry = res.first()
+    champs = data.model_fields_set
 
-    if not entry:
+    row = await session.fetchrow(
+        "UPDATE collection_entries SET "
+        "statut = CASE WHEN $3::bool THEN $4::text ELSE statut END, "
+        "note = CASE WHEN $5::bool THEN $6::int ELSE note END, "
+        "commentaire = CASE WHEN $7::bool THEN $8::text ELSE commentaire END "
+        "WHERE id = $1 AND user_id = $2 "
+        "RETURNING id AS entry_id, item_id, statut, note, "
+        "commentaire, date_ajout",
+        entry_id,
+        current_user["id"],
+        "statut" in champs and data.statut is not None,
+        data.statut.value if data.statut else None,
+        "note" in champs,
+        data.note,
+        "commentaire" in champs,
+        data.commentaire,
+    )
+
+    if row is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=404,
             detail="Entrée introuvable",
         )
 
-    if data.statut is not None:
-        entry.statut = data.statut
-    if data.note is not None:
-        entry.note = data.note
-    if data.commentaire is not None:
-        entry.commentaire = data.commentaire
-
-    session.add(entry)
-    await session.commit()
-    await session.refresh(entry)
-
-    item = await session.get(Item, entry.item_id)
-
-    return CollectionEntryRead(
-        id=entry.id,
-        statut=entry.statut,
-        note=entry.note,
-        commentaire=entry.commentaire,
-        date_ajout=entry.date_ajout,
-        item=ItemRead.model_validate(item),
+    item = await session.fetchrow(
+        f"SELECT {ITEM_FIELDS} FROM items i WHERE i.id = $1",
+        row["item_id"],
     )
+
+    return lire_entree({**dict(row), **dict(item)})
 
 
 @router.delete(
@@ -174,24 +173,22 @@ async def update_entry(
 )
 async def delete_entry(
     entry_id: int,
-    current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
+    current_user: dict = Depends(get_current_user),
+    session: asyncpg.Connection = Depends(get_session),
 ) -> Response:
-    statement = select(CollectionEntry).where(
-        CollectionEntry.id == entry_id,
-        CollectionEntry.user_id == current_user.id,
+    row = await session.fetchrow(
+        "DELETE FROM collection_entries "
+        "WHERE id = $1 AND user_id = $2 RETURNING id",
+        entry_id,
+        current_user["id"],
     )
-    res = await session.exec(statement)
-    entry = res.first()
 
-    if not entry:
+    if row is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=404,
             detail="Entrée introuvable",
         )
 
-    await session.delete(entry)
-    await session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -199,29 +196,27 @@ async def delete_entry(
     "/stats",
     summary="Statistiques de ma collection",
     response_model=StatsResponse,
+    responses={401: {"description": "Token invalide ou expiré"}},
 )
 async def get_stats(
-    current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
+    current_user: dict = Depends(get_current_user),
+    session: asyncpg.Connection = Depends(get_session),
 ) -> StatsResponse:
-    statement = select(CollectionEntry).where(
-        CollectionEntry.user_id == current_user.id
+    rows = await session.fetch(
+        "SELECT statut, note FROM collection_entries WHERE user_id = $1",
+        current_user["id"],
     )
-    res = await session.exec(statement)
-    entries = res.all()
 
-    total = len(entries)
-    par_statut = {
-        "a_decouvrir": sum(1 for e in entries if e.statut == StatutEnum.a_decouvrir),
-        "en_cours": sum(1 for e in entries if e.statut == StatutEnum.en_cours),
-        "termine": sum(1 for e in entries if e.statut == StatutEnum.termine),
-    }
+    par_statut = {statut.value: 0 for statut in StatutEnum}
 
-    notes = [e.note for e in entries if e.note is not None]
+    for row in rows:
+        par_statut[row["statut"]] += 1
+
+    notes = [row["note"] for row in rows if row["note"] is not None]
     note_moyenne = round(sum(notes) / len(notes), 2) if notes else None
 
     return StatsResponse(
-        total=total,
+        total=len(rows),
         par_statut=par_statut,
         note_moyenne=note_moyenne,
     )

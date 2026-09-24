@@ -1,8 +1,15 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field
+from enum import Enum
 
-from models.collection_entry import StatutEnum
+from pydantic import BaseModel, Field
+
 from schemas.item import ItemRead
+
+
+class StatutEnum(str, Enum):
+    a_decouvrir = "a_decouvrir"
+    en_cours = "en_cours"
+    termine = "termine"
 
 
 class CollectionEntryCreate(BaseModel):
@@ -25,8 +32,6 @@ class CollectionEntryRead(BaseModel):
     commentaire: str | None
     date_ajout: datetime
     item: ItemRead
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 class StatsResponse(BaseModel):

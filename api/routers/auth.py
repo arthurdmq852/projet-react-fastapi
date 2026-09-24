@@ -1,11 +1,9 @@
+import asyncpg
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.dependencies import get_current_user
 from core.security import create_access_token, hash_password, verify_password
 from db.database import get_session
-from models.user import User
 from schemas.auth import TokenResponse, UserLogin, UserRead, UserRegister
 
 
@@ -24,28 +22,22 @@ router = APIRouter(
 )
 async def register(
     user_data: UserRegister,
-    session: AsyncSession = Depends(get_session),
+    session: asyncpg.Connection = Depends(get_session),
 ) -> UserRead:
-    statement = select(User).where(User.email == user_data.email)
-    result = await session.exec(statement)
-    existing_user = result.first()
-
-    if existing_user:
+    try:
+        row = await session.fetchrow(
+            "INSERT INTO users (email, hashed_password) "
+            "VALUES ($1, $2) RETURNING id, email",
+            str(user_data.email),
+            hash_password(user_data.password),
+        )
+    except asyncpg.UniqueViolationError:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
+            status_code=409,
             detail="Email déjà utilisé",
         )
 
-    user = User(
-        email=str(user_data.email),
-        hashed_password=hash_password(user_data.password),
-    )
-
-    session.add(user)
-    await session.commit()
-    await session.refresh(user)
-
-    return user
+    return UserRead.model_validate(dict(row))
 
 
 @router.post(
@@ -56,27 +48,26 @@ async def register(
 )
 async def login(
     user_data: UserLogin,
-    session: AsyncSession = Depends(get_session),
+    session: asyncpg.Connection = Depends(get_session),
 ) -> TokenResponse:
-    statement = select(User).where(User.email == user_data.email)
-    result = await session.exec(statement)
-    user = result.first()
+    row = await session.fetchrow(
+        "SELECT id, hashed_password FROM users WHERE email = $1",
+        str(user_data.email),
+    )
 
-    if not user or not verify_password(
+    if row is None or not verify_password(
         user_data.password,
-        user.hashed_password,
+        row["hashed_password"],
     ):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=401,
             detail="Email ou mot de passe invalide",
         )
 
-    access_token = create_access_token(
-        data={"sub": str(user.id)},
-    )
+    token = create_access_token({"sub": str(row["id"])})
 
     return TokenResponse(
-        access_token=access_token,
+        access_token=token,
         token_type="bearer",
     )
 
@@ -85,8 +76,9 @@ async def login(
     "/me",
     summary="Obtenir mon profil",
     response_model=UserRead,
+    responses={401: {"description": "Token invalide ou expiré"}},
 )
 async def read_me(
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ) -> UserRead:
-    return current_user
+    return UserRead.model_validate(current_user)
