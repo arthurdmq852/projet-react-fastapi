@@ -44,7 +44,7 @@ export default function CataloguePage() {
       setError(null);
       try {
         const reponse = await itemsService.getItems({
-          q: rechercheDebattue || undefined,
+          q: rechercheDebattue.length >= 2 ? rechercheDebattue : undefined,
           categorie: categorie || undefined,
           page,
           limit: LIMIT,

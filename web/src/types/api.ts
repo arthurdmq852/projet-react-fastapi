@@ -4,10 +4,6 @@ export type Statut = "a_decouvrir" | "en_cours" | "termine";
 
 export type Tri = "date" | "note";
 
-// --- Catalogue ---------------------------------------------------------------
-
-// Univers choisi : ludothèque de jeux vidéo.
-// Champs génériques du contrat + champs propres à l'univers : studio, plateforme.
 export interface Item {
   id: number;
   titre: string;
