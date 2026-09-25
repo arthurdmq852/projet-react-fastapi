@@ -52,7 +52,7 @@ export default function RegisterComponent() {
         <a className="!text-black font-semibold text-center mb-2">
           Créer un compte
         </a>
-        <p>Chouffins Marketplace</p>
+        <p>CHF Marketplace</p>
 
         <input
           type="email"

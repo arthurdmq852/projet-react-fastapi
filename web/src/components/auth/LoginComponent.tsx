@@ -39,9 +39,9 @@ export default function LoginComponent() {
         className="bg-white rounded-2xl p-8 w-full max-w-sm flex flex-col gap-4"
       >
         <a className="!text-black font-semibold text-center mb-2">
-          Se connecter
+          Se connecter à
         </a>
-        <p>Chouffins Marketplace</p>
+        <p>CHF Marketplace</p>
 
         <input
           type="email"

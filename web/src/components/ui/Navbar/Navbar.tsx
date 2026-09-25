@@ -20,7 +20,7 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <Link to="/"><img src="/chouffin_chapeau.jpg" width={70} height={70} alt="" />Chouffins Marketplace</Link>
+        <Link to="/"><img src="/chouffin_chapeau.jpg" width={70} height={70} alt="" />CHF Marketplace</Link>
       </div>
 
       <div className="navbar-center">
