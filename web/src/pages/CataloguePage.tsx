@@ -74,9 +74,9 @@ export default function CataloguePage() {
   const totalPages = useMemo(() => Math.max(1, Math.ceil(total / LIMIT)), [total]);
 
   return (
-    <div>
+    <div className="flex flex-1 min-h-0 flex-col">
       <Navbar />
-      <div className="px-6 pb-24">
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 pb-24">
         <h1 className="text-4xl font-bold text-white">Découvrir de nouveaux jeux</h1>
 
         <div className="flex flex-wrap gap-3 items-center mb-6">
