@@ -21,3 +21,19 @@ PY
 fi
 
 docker compose up --build -d
+
+for b in firefox google-chrome google-chrome-stable chromium chromium-browser brave brave-browser microsoft-edge vivaldi; do
+    if command -v "$b" >/dev/null 2>&1; then
+        BROWSER="$b"
+        break
+    fi
+done
+
+if [ -n "$BROWSER" ]; then
+    echo "Launching $BROWSER..."
+    "$BROWSER" http://localhost:5173 >/dev/null 2>&1 &
+else
+    echo "No known browser found, using system default."
+    xdg-open http://localhost:5173 >/dev/null 2>&1 &
+fi
+
