@@ -74,7 +74,7 @@ export default function ItemDetailPage() {
             {item.image_url && (
               <img src={item.image_url} alt={item.titre} className="rounded-xl w-full max-h-96 object-cover" />
             )}
-            <h1 className="text-3xl font-bold">{item.titre}</h1>
+            <h1 className="!text-gray-500 text-3xl font-bold">{item.titre}</h1>
             <p className="text-gray-600">{item.categorie} · {item.annee}</p>
             <p className="text-gray-600">Studio : {item.studio} — Plateforme : {item.plateforme}</p>
             <p>{item.description}</p>
