@@ -1,7 +1,7 @@
 export default function Footer() {
   return (
-      <footer className="text-white fixed bottom-1 left-0 w-full shadow">
-        CHF Marketplace - 2026
-      </footer>
+    <footer className="w-full shrink-0 border-t border-[#2e303a] bg-[#16171d] py-2 text-center text-white">
+      CHF Marketplace - 2026
+    </footer>
   );
 }
