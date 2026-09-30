@@ -1,5 +1,3 @@
-// Types du contrat d'API (section 5 du sujet) — écrits à la main, pas de génération OpenAPI.
-
 export type Statut = "a_decouvrir" | "en_cours" | "termine";
 
 export type Tri = "date" | "note";
@@ -29,7 +27,6 @@ export interface GetItemsParams {
   limit?: number;
 }
 
-// --- Collection ----------------------------------------------------------------
 
 export interface Entry {
   id: number;
@@ -61,7 +58,7 @@ export interface UpdateEntryPayload {
 export interface Stats {
   total: number;
   par_statut: Record<Statut, number>;
-  note_moyenne: number;
+  note_moyenne: number  | null;
 }
 
 // --- Authentification ------------------------------------------------------------
