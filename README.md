@@ -38,8 +38,17 @@ Base de données :
 
 Après avoir récupéré le dépôt, ouvrir un terminal à la racine du projet et lancer
 
+
+### Sur Linux/MacOS (Ou WSL sur Windows) avec bash
+
 ``` bash
 sh start.sh
+```
+
+### Sur Windows 11 avec Powershell
+
+```powershell
+.\start.ps1
 ```
 
 Au premier démarrage, le script crée `api/.env` à partir de `api/.env.example` avec un mot de passe PostgreSQL et une clé JWT générés localement.
