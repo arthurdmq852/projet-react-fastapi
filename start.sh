@@ -22,6 +22,7 @@ fi
 
 docker compose up --build -d
 
+clear
 echo "Docker démarré. Ouverture du navigateur internet"
 sleep 2
 
