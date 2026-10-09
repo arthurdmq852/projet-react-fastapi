@@ -7,6 +7,7 @@ import { itemsService } from '../services/itemsService'
 import { ApiError } from '../services/httpClient'
 import type { Item } from '../types/api'
 
+// Nombre de jeux affichés sur la page d'accueil
 const NB_JEUX = 9 
 
 export default function HomePage() {
@@ -51,7 +52,7 @@ export default function HomePage() {
         <section className="w-full px-6 pb-12 text-left">
           <Link
             to="/catalogue"
-            className="mb-6 inline-flex items-center gap-2 text-2xl font-semibold text-white hover:opacity-80"
+            className="mb-6 inline-flex items-center gap-2 text-3xl font-semibold text-white hover:opacity-80"
           >
             Découvrir les jeux
             <span className="text-gray-500" aria-hidden="true">›</span>
