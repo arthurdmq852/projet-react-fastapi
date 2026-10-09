@@ -38,8 +38,7 @@ Base de données :
 
 Après avoir récupéré le dépôt, ouvrir un terminal à la racine du projet et lancer
 
-
-### Sur Linux/MacOS (Ou WSL sur Windows) avec bash
+### Sur Linux/MacOS (Ou WSL sur Windows) avec .sh/.bash
 
 ``` bash
 sh start.sh
@@ -51,18 +50,18 @@ sh start.sh
 .\start.ps1
 ```
 
-Au premier démarrage, le script crée `api/.env` à partir de `api/.env.example` avec un mot de passe PostgreSQL et une clé JWT générés localement.
+Au premier démarrage, le script vérifie que vous avez bien Docker sur votre machine, le met à jour si vous l'avez, ou le télécharge si vous ne l'avez pas, puis crée `api/.env` à partir de `api/.env.example` avec un mot de passe PostgreSQL et une clé JWT générés localement.
 
 Il ne modifie pas un `api/.env` déjà présent. Docker Compose construit et démarre `db (PostgreSQL), api (FastAPI) et web (Vite)`.
 L'API exécute `seed.py` au démarrage pour peupler le catalogue de 40 jeux.
 
-Site: 
+Site:
 <http://localhost:5173>
 
-Documentation de l'API: 
+Documentation de l'API:
 <http://localhost:8000/docs>
 
-API: 
+API:
 <http://localhost:8000>
 
 ## Différentes commandes de Docker
@@ -88,7 +87,7 @@ docker compose down
 Le volume postgres_data conserve les données entre les démarrages. Ne pas lancer docker compose down -v si l'on veut les garder.
 
 Frontend seul, sans Docker
-L'API backend doit déjà être disponible sur <http://localhost:8000>. Dans un autre terminal, depuis la racine du projet :
+L'API backend doit déjà être disponible sur <http://localhost:8000>. Dans un autre terminal, depuis la racine du projet:
 
 ``` bash
 cd web

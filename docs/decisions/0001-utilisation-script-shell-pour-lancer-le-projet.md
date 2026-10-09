@@ -36,7 +36,6 @@ pour les utilisateurs peu expérimentés.
 ### Conséquences
 
 * Bon, car le projet se lance avec une seule commande (`./start.sh`).
-* Bon, car le script est un simple fichier, lisible.
 * Mauvais, car l'utilisation du script est plus accessible sur Linux/MacOS,
   il faut utiliser WSL sur Windows.
 
@@ -67,7 +66,6 @@ Le projet est écrit dans un fichier `docker-compose.yaml` et lancé avec
 
 Un fichier unique (`start.sh`) enchaîne toutes les étapes de lancement.
 
-* Bon, car un seul point d'entrée, une seule commande.
 * Bon, car simple à écrire, à lire et à modifier.
 * Bon, car peut lui-même appeler Docker Compose et les autres commandes
   nécessaires, en masquant leur complexité.
