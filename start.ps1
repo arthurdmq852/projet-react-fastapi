@@ -99,5 +99,7 @@ if (-not (Test-Path "api\.env")) {
 docker compose up --build -d
 if ($LASTEXITCODE -ne 0) { throw "docker compose failed" }
 
+Start-Sleep -Seconds 2
+
 Write-Host "Opening default browser..."
 Start-Process "http://localhost:5173"

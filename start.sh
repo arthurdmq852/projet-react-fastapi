@@ -22,6 +22,9 @@ fi
 
 docker compose up --build -d
 
+echo "Docker démarré. Ouverture du navigateur internet"
+sleep 2
+
 for b in firefox google-chrome google-chrome-stable chromium chromium-browser brave brave-browser microsoft-edge vivaldi; do
     if command -v "$b" >/dev/null 2>&1; then
         BROWSER="$b"
