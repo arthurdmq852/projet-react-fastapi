@@ -61,41 +61,46 @@ export default function ItemDetailPage() {
     }
   }
 
-  return (
-    <div>
-      <Navbar />
-      <div className="px-6 pb-24 max-w-3xl mx-auto">
-        {loading && <p className="text-white">Chargement…</p>}
+ return (
+    <div className="fixed inset-0 overflow-y-auto bg-[#16171d]">
+      <div className="min-h-full flex flex-col">
+        <Navbar />
 
-        {!loading && messageErreur && <p className="text-red-400">{messageErreur}</p>}
+        <main className="flex-1 w-full px-6 pb-24">
+          <div className="max-w-3xl mx-auto w-full">
+            {loading && <p className="text-white">Chargement…</p>}
 
-        {!loading && !messageErreur && item && (
-          <div className="bg-white rounded-2xl p-6 flex flex-col gap-3 text-black">
-            {item.image_url && (
-              <img src={item.image_url} alt={item.titre} className="rounded-xl w-full max-h-96 object-cover" />
-            )}
-            <h1 className="!text-gray-500 text-3xl font-bold">{item.titre}</h1>
-            <p className="text-gray-600">{item.categorie} · {item.annee}</p>
-            <p className="text-gray-600">Studio : {item.studio} — Plateforme : {item.plateforme}</p>
-            <p>{item.description}</p>
+            {!loading && messageErreur && <p className="text-red-400">{messageErreur}</p>}
 
-            {isAuthenticated ? (
-              estDansLaCollection(item.id) ? (
-                <p className="text-green-600 font-semibold">Déjà dans votre collection.</p>
-              ) : (
-                <Button variant="blue" disabled={ajoutEnCours} onClick={() => void handleAjouter()}>
-                  {ajoutEnCours ? "Ajout…" : "Ajouter à ma collection"}
-                </Button>
-              )
-            ) : (
-              <Button variant="blue" onClick={() => navigate("/login")}>
-                Se connecter pour l'ajouter à ma collection
-              </Button>
+            {!loading && !messageErreur && item && (
+              <div className="bg-white rounded-2xl p-6 flex flex-col gap-3 text-black">
+                {item.image_url && (
+                  <img src={item.image_url} alt={item.titre} className="rounded-xl w-full max-h-96 object-cover" />
+                )}
+                <h1 className="text-gray-500 text-3xl font-bold">{item.titre}</h1>
+                <p className="text-gray-600">{item.categorie} · {item.annee}</p>
+                <p className="text-gray-600">Studio : {item.studio} — Plateforme : {item.plateforme}</p>
+                <p>{item.description}</p>
+
+                {isAuthenticated ? (
+                  estDansLaCollection(item.id) ? (
+                    <p className="text-green-600 font-semibold">Déjà dans votre collection.</p>
+                  ) : (
+                    <Button variant="blue" disabled={ajoutEnCours} onClick={() => void handleAjouter()}>
+                      {ajoutEnCours ? "Ajout…" : "Ajouter à ma collection"}
+                    </Button>
+                  )
+                ) : (
+                  <Button variant="blue" onClick={() => navigate("/login")}>
+                    Se connecter pour l'ajouter à ma collection
+                  </Button>
+                )}
+              </div>
             )}
           </div>
-        )}
+        </main>
+
+        <Footer />
       </div>
-      <Footer />
     </div>
-  );
-}
+  );}
